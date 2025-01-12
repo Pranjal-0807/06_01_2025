@@ -7,12 +7,11 @@ const {
 } = require("../db.js");
 const { canViewProject, canEditProject } = require("../permissions.js");
 const { populateProject } = require("../middleware/data.js");
+const { paginate } = require("../middleware/pagination.js");
 const router = require("express").Router();
 
-router.get("/", (req, res) => {
-  const detailedProjects = PROJECTS.filter((project) =>
-    canViewProject(req.user, project)
-  ).map((project) => {
+router.get("/", filterProjects, paginate, (req, res) => {
+  const detailedProjects = res.paginatedResults.results.map((project) => {
     const taskCount = findTasksByProject(project.id).length;
     const manager = findManager(project.managerId);
     return {
@@ -21,8 +20,16 @@ router.get("/", (req, res) => {
       managerName: manager ? manager.username : null,
     };
   });
-  res.json(detailedProjects);
+  res.paginatedResults.results = detailedProjects;
+  res.json(res.paginatedResults);
 });
+
+function filterProjects(req, res, next) {
+  req.paginationResource = PROJECTS.filter((project) =>
+    canViewProject(req.user, project)
+  );
+  next();
+}
 
 router.get("/:id", populateProject, authViewProject, (req, res) => {
   res.json(fillProjectDetails(req.project));
@@ -80,7 +87,9 @@ router.post("/:id/task", populateProject, (req, res) => {
   res.status(201).json(newTask);
 });
 
+// {
 router.delete("/:id", populateProject, authEditProject, (req, res) => {
+  // }
   console.log("Marked project completed", req.project.id);
   res.status(204).send();
 });
