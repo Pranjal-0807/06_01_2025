@@ -3,7 +3,9 @@ const { ROLES } = require("../db.js");
 
 function authToken(req, res, next) {
   const authHeader = req.headers["authorization"];
+  // console.log(authHeader);
   const token = authHeader && authHeader.split(" ")[1];
+  // console.log(token);
 
   if (!token) {
     return res.status(400).json({ message: "You need to login!!!" });

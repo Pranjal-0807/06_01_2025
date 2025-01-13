@@ -10,9 +10,11 @@ const app = express();
 const PORT = 5050;
 
 app.use(express.json());
+
 app.use(authToken);
 
 app.use("/tasks", authRole(ROLES.USER), tasksRouter);
+
 app.use("/projects", authRole(ROLES.ADMIN, ROLES.MANAGER), projectsRouter);
 
 app.get("/users", authRole(ROLES.ADMIN), filterUsers, paginate, (req, res) => {

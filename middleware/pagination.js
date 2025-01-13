@@ -5,7 +5,7 @@ function paginate(req, res, next) {
 
   const startIndex = (pageNum - 1) * limitNum;
   const endIndex = startIndex + limitNum;
-  console.log(endIndex);
+  // console.log(endIndex);
   const results = req.paginationResource.slice(startIndex, endIndex);
   const totalPages = Math.ceil(req.paginationResource.length / limitNum);
 
